@@ -74,5 +74,12 @@ contract CarTransactions {
     //(address: buyer, string : motorId, uint: amount of money)
     mapping(address => mapping(string => uint256)) blockedMoney;
 
+    //makes sure that the amount sent is correct
+    modifier suficcientBalance(uint256 price){
+        require(price == msg.value);
+        _;
+    }
+
+    
 
 }
