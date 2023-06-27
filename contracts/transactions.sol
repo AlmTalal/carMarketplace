@@ -42,7 +42,7 @@ contract CarTransactions {
     }
 
     struct Seller{
-        //soldCars is only modified after the buyer's confirming of the delivery and it contains the motorId
+        //soldCars, it contains all the cars that has been sold or are being on sale of the seller
         string[] soldCars;
         //earnedMoney is for the total amount of money the user has earned, is only modified 
         //after the buyer's confirming of confirming the delivery
@@ -69,17 +69,27 @@ contract CarTransactions {
     //All the buyers in the contract
     mapping(address => Buyer) buyers;
     //All the sellers in the contract
-    mapping(address => Seller) seller;
+    mapping(address => Seller) sellers;
     //All the money that is waiting for the buyer confirming 
     //(address: buyer, string : motorId, uint: amount of money)
     mapping(address => mapping(string => uint256)) blockedMoney;
 
     //makes sure that the amount sent is correct
     modifier suficcientBalance(uint256 price){
-        require(price == msg.value);
+        require(price == msg.value,"You did not passed the right amount of money");
         _;
     }
 
-    
+    function sellCar(string memory motorId, uint256 price) public{
+        //Adding to seller's sold cars
+        sellers[msg.sender].soldCars.push(motorId);
+        //Adding to the contract total cars 
+        motorIds.push(motorId);
+        //Creating the cars struct 
+        cars[motorId].motorId = motorId;
+        cars[motorId].price = price;
+        cars[motorId].seller = msg.sender;
+        emit CarAddedToSale(msg.sender, price, motorId, block.timestamp);
+    }
 
 }
