@@ -92,4 +92,20 @@ contract CarTransactions {
         emit CarAddedToSale(msg.sender, price, motorId, block.timestamp);
     }
 
+    function buyCar(string memory motorId) external payable suficcientBalance(msg.value) {
+        require(!cars[motorId].sold, "The car is sold");
+
+        //modifying the car struct 
+        cars[motorId].sold = true;
+        cars[motorId].buyer = msg.sender;
+        //Adding blockedMoney to the seller
+        sellers[cars[motorId].seller].blockedMoney += msg.value;
+        //Adding money to the contract total amount of blocked money
+        blockedMoney[msg.sender][motorId] += msg.value;
+
+        emit CarBought(msg.sender, cars[motorId].seller, msg.value, motorId);
+    }
+
+    
+
 }
