@@ -139,4 +139,13 @@ contract CarTransactions {
 
         emit Withdraw(amount, block.timestamp);
     }
+
+    function getAllCars() public view returns(string[] memory){
+        return motorIds;
+    }
+
+    function getUserSoldCars() public view returns(string[] memory){
+        return sellers[msg.sender].soldCars;
+    }  
+
 }
