@@ -106,6 +106,23 @@ contract CarTransactions {
         emit CarBought(msg.sender, cars[motorId].seller, msg.value, motorId);
     }
 
+    function approveCarDelivery(string memory motorId) public {
+        uint money = blockedMoney[msg.sender][motorId];
+        //Seller struct
+        Seller storage carSeller = sellers[cars[motorId].seller];
+        carSeller.blockedMoney -= money; 
+        carSeller.currentMoney += money;
+        carSeller.earnedMoney += money;
+        //buyer struct
+        Buyer storage carBuyer = buyers[msg.sender];
+        carBuyer.blockedMoney -= money;
+        carBuyer.spentMoney += money;
+        carBuyer.boughtCars.push(motorId);
+        //decreasing the amount of money that blocked money has 
+        blockedMoney[msg.sender][motorId] -= money;
+        emit CarDelivered(block.timestamp);
+    }
+
     
 
 }
