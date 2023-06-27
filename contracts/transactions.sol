@@ -1,5 +1,14 @@
 pragma solidity >=0.4.22 <=0.8.19;
 
+/* 
+We should try to change all the string[] of motorIds and the strings of motorId 
+to a uint type array or var. Maybe with a function that converts string to unique 
+number with a key like hashing it would be possible. The thing is that i don't know if 
+we should do it at the contract level or more like at consuming the contract and sending the 
+data level.
+*/
+
+
 contract CarTransactions {
     //Emit when the seller puts a new car on sale 
     event CarAddedToSale(
@@ -24,8 +33,6 @@ contract CarTransactions {
 
     struct Buyer{
         //BoughtCars is only modified after confirming the delivery and it contains the motorId
-        //We should try to change this to a uint type array, maybe with a function that converts string to unique number with a key
-        //like hashing it would be possible
         string[] boughtCars;
         //spentMoney is for the total amount of money the user has spent, and is only modified after confirming the delivery
         uint256 spentMoney;
@@ -36,8 +43,6 @@ contract CarTransactions {
 
     struct Seller{
         //soldCars is only modified after the buyer's confirming of the delivery and it contains the motorId
-        //We should try to change this to a uint type array, maybe with a function that converts string to unique number with a key
-        //like hashing it would be possible
         string[] soldCars;
         //earnedMoney is for the total amount of money the user has earned, is only modified 
         //after the buyer's confirming of confirming the delivery
@@ -50,12 +55,24 @@ contract CarTransactions {
     }
 
     struct Car{
-        //We should try to change this to a uint type array, maybe with a function that converts string to unique number with a key
-        //like hashing it would be possible
         string motorId;
         uint256 price;
         bool sold;
         address seller;
         address buyer;
     }
+
+    //the motor id of all the cars that are in the contract (either sold or not)
+    string[] motorIds;
+    //All the cars in the contract, the string will be the motorId
+    mapping(string => Car) cars;
+    //All the buyers in the contract
+    mapping(address => Buyer) buyers;
+    //All the sellers in the contract
+    mapping(address => Seller) seller;
+    //All the money that is waiting for the buyer confirming 
+    //(address: buyer, string : motorId, uint: amount of money)
+    mapping(address => mapping(string => uint256)) blockedMoney;
+
+
 }
