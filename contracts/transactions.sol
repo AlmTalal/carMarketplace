@@ -31,6 +31,9 @@ contract CarTransactions {
         uint timestamp
     );
 
+    //Emit when the sellers withdraws money
+    event Withdraw(uint256 amount, uint256 timestamp);
+
     struct Buyer{
         //BoughtCars is only modified after confirming the delivery and it contains the motorId
         string[] boughtCars;
@@ -80,6 +83,11 @@ contract CarTransactions {
         _;
     }
 
+    modifier canWithdraw(uint256 amount){
+        require(sellers[msg.sender].currentMoney >= amount, "You Are trying to withdraw more funds than you currently have");
+        _;
+    }
+
     function sellCar(string memory motorId, uint256 price) public{
         //Adding to seller's sold cars
         sellers[msg.sender].soldCars.push(motorId);
@@ -119,10 +127,16 @@ contract CarTransactions {
         carBuyer.spentMoney += money;
         carBuyer.boughtCars.push(motorId);
         //decreasing the amount of money that blocked money has 
-        blockedMoney[msg.sender][motorId] -= money;
+        delete blockedMoney[msg.sender][motorId];
         emit CarDelivered(block.timestamp);
     }
 
-    
+    //When the seller withdraw his money
+    function withDraw(uint256 amount) external canWithdraw(amount){
+        sellers[msg.sender].currentMoney -= amount;
+        (bool sent,) = payable(msg.sender).call{value: amount}("");
+        require(sent,"transcation Failed");
 
+        emit Withdraw(amount, block.timestamp);
+    }
 }
